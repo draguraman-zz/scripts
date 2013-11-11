@@ -1,0 +1,40 @@
+#!/usr/bin/perl -l
+
+
+#Notes to usage.Please do not use it on any live node.Staging Preferrable
+#usage ./getMCShard -k KEYNAME -n NUM_NODES_IN_POOL [-v]
+#Instance:./getMCShard -k <keyname> -n 10
+#Incase you have a list :cat /tmp/uid.lst | xargs -n1 ./getMCShard -n 10 -v -k
+#You need the package  perl-Compress-Zlib.Do a yum install perl-Compress-Zlib
+#You need the list in the format city_USER_<Zid>: %s/.*/city_USER_&/g should help
+
+
+use Getopt::Long;
+#use Digest::FNV qw(fnv32 fnv64);
+
+my ($opt_key, $opt_nodes, $opt_verbose);
+
+GetOptions( 'key=s' => \$opt_key,
+		'nodes=i' => \$opt_nodes,
+		'verbose' => \$opt_verbose );
+
+
+unless (defined($opt_nodes) && defined($opt_key)) {
+	print "Usage: $0 -k key -n machines_in_pool\n";
+	exit(1);
+}
+
+$hash = (crc32($opt_key) >> 16) & 0x7fff;
+#$hash = (fnv64($opt_key) >> 16) & 0x7fff;
+
+if ($opt_verbose) {
+	printf("%s,", $opt_key);
+}
+
+print $hash % $opt_nodes ;
+
+#printf("\t%s %d\n", $opt_key, $hash % $opt_nodes);
+
+exit(0);
+
+
